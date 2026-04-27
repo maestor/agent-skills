@@ -44,19 +44,3 @@ npx skills add maestor/agent-skills
 ```
 
 According to the `skills.sh` FAQ, the ecosystem works with popular agents including Claude Code, Cursor, Windsurf, and others. Check your agent's own docs for exact local integration details.
-
-## Optional Local CLI
-
-This repo also ships a small local helper CLI:
-
-```bash
-node bin/skills.mjs list
-node bin/skills.mjs install intelligence-testing
-node bin/skills.mjs install --all
-```
-
-## Notes
-
-- This repo now ships a small project-local installer CLI in `bin/skills.mjs`.
-- Do not hand-edit generated files inside installed skills unless you intentionally want the project copy to diverge from the repo.
-- Prefer keeping each skill lean: `SKILL.md` plus `agents/openai.yaml`, and add `references/` only when it materially improves reuse.
