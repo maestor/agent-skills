@@ -1,6 +1,6 @@
 ---
 name: intelligence-testing
-description: Use when working on application code that should be built with behavior-first TDD: define the real usage story, write the highest-signal failing test first, implement the smallest change to pass it, and refactor only after behavior is protected. Helps choose the right test layer, cover realistic user, API, mobile, and operator scenarios, avoid mock-heavy duplication, and remove speculative defensive branches or fallback logic that cannot be exercised by real usage.
+description: "Use when working on application code that should be built with behavior-first TDD: define the real usage story, write the highest-signal failing test first, implement the smallest change to pass it, and refactor only after behavior is protected. Helps choose the right test layer, cover realistic user, API, mobile, and operator scenarios, avoid mock-heavy duplication, and remove speculative defensive branches or fallback logic that cannot be exercised by real usage."
 ---
 
 # Intelligence Testing
