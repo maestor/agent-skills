@@ -1,4 +1,4 @@
-# agent-skills
+# Agent skills by maestor
 
 Reusable agent skills for especially JavaScript/TypeScript infrastructure, including web apps, mobile apps, APIs, and other product codebases that benefit from shared engineering workflows.
 
