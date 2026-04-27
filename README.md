@@ -1,6 +1,6 @@
 # agent-skills
 
-Reusable project-local agent skills for JavaScript/TypeScript infrastructure, including web apps, mobile apps, APIs, and other product codebases that benefit from shared engineering workflows.
+Reusable agent skills for JavaScript/TypeScript infrastructure, including web apps, mobile apps, APIs, and other product codebases that benefit from shared engineering workflows.
 
 ## Skills
 
