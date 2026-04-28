@@ -10,6 +10,7 @@ Reusable agent skills for especially JavaScript/TypeScript infrastructure, inclu
 | `mutation-testing`         | Effective backend mutation testing with incremental reruns        | Survived, no-coverage, and timeout mutants are failures | backend           |
 | `api-contract-sync`        | Keeping backend contracts, generated types, and consumers aligned | Source of truth first, no drift                         | backend, frontend |
 | `local-first-verification` | Choosing the cheapest honest local verification path              | Escalate only when needed                               | backend, frontend |
+| `browser-ui-verification`  | Browser-validated web UI changes, especially themes and dark mode | Real browser before handoff                             | web frontend      |
 | `accessibility-first-ui`   | Building accessible web and mobile UI from the start              | Accessibility is behavior, not garnish                  | frontend          |
 
 ## Repository Layout

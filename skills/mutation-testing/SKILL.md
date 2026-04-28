@@ -32,6 +32,14 @@ This skill is backend-focused. Do not apply it to routine frontend changes by de
 - Handle timeout mutants by fixing unbounded loops, retry paths, sleeps, clocks, async waits, or missing fail-fast boundaries before merely raising timeouts.
 - Use coverage ignores only for type-only artifacts, generated/source-map artifacts, or explicitly unreachable platform branches, and leave a short nearby reason.
 
+## Token And Cost Discipline
+
+- Run the smallest honest mutation scope that can cover the changed backend behavior.
+- Prefer incremental, cached, file-scoped, or changed-area reruns over repeated full mutation runs.
+- Do not paste full mutant reports, long HTML summaries, or every killed mutant into the conversation.
+- Summarize only the command, scope, final score, survived/no-coverage/timeout counts, and unresolved mutants.
+- Stop once the mutation result is clean or the remaining gap is precise enough to act on; broaden only when the current scope cannot prove the affected behavior.
+
 ## TypeScript Backend Bias
 
 For TypeScript backend projects, the proven default shape is Stryker over the repo's normal test runner:
@@ -153,7 +161,8 @@ When applying this skill to a task:
 1. Decide whether mutation testing is warranted for the backend change.
 2. Inspect and preserve the repo's existing mutation setup.
 3. Run the configured or narrowest honest incremental mutation check.
-4. Triage survived, no-coverage, and timeout mutants as quality failures.
-5. Fix survivors through behavior tests or production simplification.
-6. Fix no-coverage and timeout outcomes at their root cause.
-7. Report the mutation result, remaining mutants if any, and the exact residual risk.
+4. Keep reruns and reporting scoped to the changed behavior and actionable mutants.
+5. Triage survived, no-coverage, and timeout mutants as quality failures.
+6. Fix survivors through behavior tests or production simplification.
+7. Fix no-coverage and timeout outcomes at their root cause.
+8. Report the mutation result, remaining mutants if any, and the exact residual risk.

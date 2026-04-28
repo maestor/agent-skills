@@ -38,6 +38,15 @@ Usually skip mutation tests for:
 - type-only source changes that erase at runtime
 - exploratory implementation before focused tests pass
 
+## Token And Cost Discipline
+
+- Start with the narrowest mutation target that still reaches the changed backend behavior.
+- Use incremental or cached reruns whenever the tool supports them.
+- Avoid repeated full mutation runs after each small assertion or production edit.
+- Open detailed reports only for survived, no-coverage, timed-out, or otherwise actionable mutants.
+- Do not copy large mutation reports into the conversation; report command, scope, score, counts, and the unresolved mutant locations.
+- Broaden the mutation scope only when the current target cannot prove affected behavior or the repo's quality gate requires a full run.
+
 ## Outcome Triage Matrix
 
 | Outcome       | What it usually means                                                                    | Best response                                                                           | Avoid                                   |
