@@ -4,20 +4,21 @@ Reusable agent skills for especially JavaScript/TypeScript infrastructure, inclu
 
 ## Skills
 
-| Skill | Use for | Key bias | Project type |
-| --- | --- | --- | --- |
-| `intelligence-testing` | Behavior-first TDD for real user, API, and operator flows | Highest-signal failing test first | backend, frontend |
-| `api-contract-sync` | Keeping backend contracts, generated types, and consumers aligned | Source of truth first, no drift | backend, frontend |
-| `local-first-verification` | Choosing the cheapest honest local verification path | Escalate only when needed | backend, frontend |
-| `accessibility-first-ui` | Building accessible web and mobile UI from the start | Accessibility is behavior, not garnish | frontend |
+| Skill                      | Use for                                                           | Key bias                                                | Project type      |
+| -------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- | ----------------- |
+| `intelligence-testing`     | Behavior-first TDD for real user, API, and operator flows         | Highest-signal failing test first                       | backend, frontend |
+| `mutation-testing`         | Effective backend mutation testing with incremental reruns        | Survived, no-coverage, and timeout mutants are failures | backend           |
+| `api-contract-sync`        | Keeping backend contracts, generated types, and consumers aligned | Source of truth first, no drift                         | backend, frontend |
+| `local-first-verification` | Choosing the cheapest honest local verification path              | Escalate only when needed                               | backend, frontend |
+| `accessibility-first-ui`   | Building accessible web and mobile UI from the start              | Accessibility is behavior, not garnish                  | frontend          |
 
 ## Repository Layout
 
-| Path | Purpose |
-| --- | --- |
-| `skills/<skill-name>/SKILL.md` | Main workflow and trigger description |
-| `skills/<skill-name>/agents/openai.yaml` | UI metadata for the skill |
-| `skills/<skill-name>/references/` | Optional deeper guidance loaded only when needed |
+| Path                                     | Purpose                                          |
+| ---------------------------------------- | ------------------------------------------------ |
+| `skills/<skill-name>/SKILL.md`           | Main workflow and trigger description            |
+| `skills/<skill-name>/agents/openai.yaml` | UI metadata for the skill                        |
+| `skills/<skill-name>/references/`        | Optional deeper guidance loaded only when needed |
 
 ## Install
 
@@ -26,15 +27,13 @@ The primary install path is the standard [`skills.sh`](https://skills.sh/docs/cl
 Install one skill:
 
 ```bash
-npx skills add maestor/agent-skills --skill intelligence-testing
+npx skills add maestor/agent-skills --skill <skill-name>
 ```
 
-Examples:
+Example:
 
 ```bash
-npx skills add maestor/agent-skills --skill api-contract-sync
-npx skills add maestor/agent-skills --skill local-first-verification
-npx skills add maestor/agent-skills --skill accessibility-first-ui
+npx skills add maestor/agent-skills --skill intelligence-testing
 ```
 
 If you want the full collection, use the repository itself:

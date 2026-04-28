@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mutation Testing"
+  short_description: "Use incremental backend mutation tests effectively"
+  default_prompt: "Use $mutation-testing to decide when to run backend mutation tests and handle survived, no-coverage, and timeout mutants."
