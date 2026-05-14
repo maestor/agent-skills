@@ -12,6 +12,7 @@ Reusable agent skills for especially JavaScript/TypeScript infrastructure, inclu
 | `local-first-verification` | Choosing the cheapest honest local verification path              | Escalate only when needed                               | backend, frontend |
 | `browser-ui-verification`  | Browser-validated web UI changes, especially themes and dark mode | Real browser before handoff                             | web frontend      |
 | `accessibility-first-ui`   | Building accessible web and mobile UI from the start              | Accessibility is behavior, not garnish                  | frontend          |
+| `project-documentation`    | Keeping README and docs current, concise, and project-specific    | Docs change with the workflow                           | backend, frontend |
 
 ## Repository Layout
 
