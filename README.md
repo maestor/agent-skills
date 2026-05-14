@@ -13,6 +13,7 @@ Reusable agent skills for especially JavaScript/TypeScript infrastructure, inclu
 | `browser-ui-verification`  | Browser-validated web UI changes, especially themes and dark mode | Real browser before handoff                             | web frontend      |
 | `accessibility-first-ui`   | Building accessible web and mobile UI from the start              | Accessibility is behavior, not garnish                  | frontend          |
 | `project-documentation`    | Keeping README and docs current, concise, and project-specific    | Docs change with the workflow                           | backend, frontend |
+| `git-pr-workflow`          | Standardizing branch, review, verify, commit, push, and PR notes  | Review pause before final gate                          | backend, frontend |
 
 ## Repository Layout
 
