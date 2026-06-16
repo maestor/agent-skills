@@ -45,4 +45,27 @@ If you want the full collection, use the repository itself:
 npx skills add maestor/agent-skills
 ```
 
+## Update Installed Skills
+
+If a consumer has already installed a skill from this repository, they can refresh it with the `skills` CLI update command.
+The CLI updates one scope at a time, so if you use both project and global installs, run the project and global examples separately.
+
+Update one installed skill by name:
+
+```bash
+npx skills update intelligence-testing
+```
+
+Update multiple installed skills by name:
+
+```bash
+npx skills update intelligence-testing git-pr-workflow
+```
+
+Update all installed project skills in the current repository:
+
+```bash
+npx skills update -p -y
+```
+
 According to the `skills.sh` FAQ, the ecosystem works with popular agents including Claude Code, Cursor, Windsurf, and others. Check your agent's own docs for exact local integration details.
