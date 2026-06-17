@@ -32,6 +32,8 @@ Read [references/workflow-checklist.md](./references/workflow-checklist.md) when
 - Use targeted checks while implementing, but reserve the final verification gate for after user review and acceptance.
 - Commit in reasonable, coherent batches. A single PR may contain multiple commits.
 - Use capitalized conventional commit prefixes such as `Feature:`, `Fix:`, `Docs:`, `Chore:`, `Refactor:`, or `Test:`.
+- Treat dependent Git write operations as a strict sequence, not parallel work.
+- Never run `git add`, `git commit`, and `git push` in parallel or in one combined step; each depends on the previous step succeeding and should be checked in order.
 - After acceptance, verification, and commit, push the branch unless the user explicitly wants to stop before push.
 - End with a separate clickable GitHub PR link and copy-pasteable PR notes in a single fenced code block unless the branch is intentionally not PR-ready.
 
@@ -115,6 +117,15 @@ Read [references/workflow-checklist.md](./references/workflow-checklist.md) for 
 
 Once the accepted batch is verified, commit it unless the user explicitly wants to hold commits.
 
+Use a strict order for Git write actions:
+
+1. stage the intended files
+2. inspect the staged scope if anything is non-obvious
+3. create the commit
+4. push only after the commit succeeds
+
+Do not parallelize or overlap any of those steps. If staging, commit creation, or push fails, stop and resolve that specific failure before moving on.
+
 Use commit messages like:
 
 - `Feature: Add park visit summary cards`
@@ -131,6 +142,8 @@ When the branch is accepted, verified, and committed:
 - push the branch
 - if more implementation is still planned on the same branch, say so clearly
 - if the branch is PR-ready, provide a separate clickable GitHub PR link and copy-pasteable PR notes
+
+Push is always downstream of a successful commit. Do not start push work until commit output confirms the new commit exists locally.
 
 PR notes should usually include:
 
@@ -149,6 +162,7 @@ Place the clickable GitHub PR link outside the fenced code block so the user can
 - treating targeted tests as a substitute for the final verify gate
 - running final verify before the user has reviewed the batch
 - building one giant end-of-task commit when the work had obvious batch boundaries
+- parallelizing `git add`, `git commit`, and `git push`
 - skipping the PR link or PR notes without saying why
 - mixing docs-only exceptions into runtime-code changes without calling out the difference
 
@@ -161,5 +175,5 @@ When applying this skill to a task:
 3. Implement in coherent batches with iterative checks.
 4. Pause for user review before the final verification gate.
 5. After acceptance, run the real verification gate.
-6. Commit with consistent prefixes.
-7. Push the branch and provide a clickable PR link plus fenced PR notes when ready.
+6. Stage and commit in strict sequence with consistent prefixes.
+7. Push only after the commit succeeds, then provide a clickable PR link plus fenced PR notes when ready.
