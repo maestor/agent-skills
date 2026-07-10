@@ -86,6 +86,13 @@ Message style:
 - keep the rest in normal sentence style
 - avoid vague messages like `Fix stuff`
 
+Commit body style:
+
+- when the commit is substantial enough to need an extended description, add a short body
+- use the same bullets you expect to place later under PR-notes `Summary` for that commit
+- do not include `Title`, `Summary`, `Verification`, or `Notes` headings in the commit body
+- if multiple commits roll into one PR, keep each commit body limited to its own bullets
+
 ## Push And Handoff
 
 When the batch is accepted, verified, and committed:
@@ -112,6 +119,8 @@ Verification
 - `npm run verify`
 - Any scoped checks worth mentioning
 ```
+
+When a related commit includes an extended description, the PR-notes `Summary` bullets should mirror those commit-body bullets.
 
 ## Lean AGENTS.md Pattern
 

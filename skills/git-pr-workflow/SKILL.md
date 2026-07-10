@@ -135,6 +135,13 @@ Use commit messages like:
 
 Use sentence-style capitalization after the colon.
 
+When a commit is substantial enough to benefit from an extended description:
+
+- add a short commit body
+- reuse the same bullet points you plan to include later under the PR-notes `Summary` section for that commit
+- keep only the bullets in the commit body, not the `Title`, `Summary`, `Verification`, or `Notes` headings
+- if the PR will contain multiple commits, keep each commit body scoped to the bullets that belong to that commit
+
 ### 7. Push and prepare handoff
 
 When the branch is accepted, verified, and committed:
@@ -150,6 +157,8 @@ PR notes should usually include:
 - `Title`
 - `Summary`
 - `Verification`
+
+The `Summary` bullets in PR notes should match the extended commit description bullets for the related commit when that commit has a body.
 
 Wrap the notes in one fenced code block so they are easy to copy.
 
