@@ -127,19 +127,19 @@ When a related commit includes an extended description, the PR-notes `Summary` b
 
 Use this when the user says `clean workspace`, `clean up merged branches`, `cleanup after merge`, or equivalent wording.
 
-The desired end state is the latest `main`, with only the currently active working branch removed. This workflow uses Git patch equivalence, so it supports squash merges without relying on commit ancestry or external PR queries.
+The desired end state is the latest `main`, with only the currently active working branch removed. This workflow verifies the branch's complete net diff, so it supports squash merges of any number of commits without relying on commit ancestry or external PR queries.
 
 1. Check `git status --short` and record the current branch as the one and only target. If the worktree is not clean, or the branch is `main`, detached, or checked out by another worktree, stop. Do not list or inspect other local branches.
 2. Run `git fetch origin`.
-3. Run `git log --cherry-pick --right-only --no-merges --format=%H origin/main...<branch>`. Continue only when it produces no output: the active branch then contains no patch absent from `origin/main`, even after a squash merge.
-4. If it produces output, stop and explain that one or more active-branch patches are not present in `origin/main`.
+3. Find `git merge-base origin/main <branch>`. Create a temporary detached worktree at `origin/main`, then run `git diff --binary <merge-base> <branch> | git -C <temporary-worktree> apply --reverse --check`. Continue only when the reverse check succeeds. It verifies that the complete active-branch change is already present in `origin/main`, regardless of how many commits the squash merge combined. Always remove the temporary worktree after the check.
+4. If the reverse check fails, remove the temporary worktree, stop, and explain that the active branch's complete change cannot be reversed cleanly from `origin/main`.
 5. Run `git switch main`, then `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
 6. Delete only the recorded target with `git branch -D <branch>`. If deletion fails, leave it intact and report the reason. Otherwise, finish on clean, up-to-date `main` and report only that target was removed.
 
 Important boundaries:
 
 - A missing `origin/<branch>` is not used as evidence of merge status; remote-branch deletion is outside this workflow.
-- `git branch -D` is allowed only for the active branch after patch-equivalence verification. It is necessary because squash merges do not retain the original branch tip in `main`'s ancestry.
+- `git branch -D` is allowed only for the active branch after branch-level patch-containment verification. It is necessary because squash merges do not retain the original branch tip in `main`'s ancestry.
 - Do not use `git reset`, `git clean`, `git stash`, or destructive recovery commands for this workflow.
 - A target checked out by another worktree must be retained; report it rather than trying to remove it.
 
