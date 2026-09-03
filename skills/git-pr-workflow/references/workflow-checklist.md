@@ -100,7 +100,7 @@ When the batch is accepted, verified, and committed:
 - push the branch
 - state clearly if more work is still planned before PR
 - if PR-ready, provide a separate clickable GitHub PR link and notes in one fenced code block
-- after the notes, include this brief next-step hint: “After this PR is merged, while still on `<branch-name>`, say `clean workspace` to verify it, update `main`, and remove the local branch.”
+- after the notes, include this brief next-step hint: “After this PR is merged, while still on `<branch-name>`, say `clean workspace` to verify its patches, update `main`, and remove the local branch.”
 
 `git push` is downstream of a successful local commit, not a concurrent action.
 
@@ -127,19 +127,19 @@ When a related commit includes an extended description, the PR-notes `Summary` b
 
 Use this when the user says `clean workspace`, `clean up merged branches`, `cleanup after merge`, or equivalent wording.
 
-The desired end state is the latest `main`, with only the currently active working branch removed. This workflow verifies the branch's GitHub PR is merged, so it supports squash merges without relying on Git ancestry.
+The desired end state is the latest `main`, with only the currently active working branch removed. This workflow uses Git patch equivalence, so it supports squash merges without relying on commit ancestry or external PR queries.
 
-1. Check `git status --short`. If it is not empty, stop: do not switch, pull, stash, reset, or delete branches. Report that the worktree must be resolved first.
-2. Record the current branch as the one and only target. Stop if it is `main`, detached, or checked out by another worktree. Do not list or inspect other local branches.
-3. Verify the target PR has been merged with GitHub CLI before any write operation. Use `gh pr list --head <branch> --state merged --json number,mergedAt --limit 1`, and continue only if it returns a merged PR. If `gh` is missing or unauthenticated, stop and ask for a verified PR link or explicit authorization to delete without verification.
-4. Refresh remote state with `git fetch origin`. Remote working branches are deleted automatically by GitHub and are outside this workflow.
-5. Switch to `main` and update it using `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
-6. Delete only the recorded target with `git branch -D <branch>`. If deletion fails, leave it intact and report the reason. Otherwise, report that target was removed; do not mention unrelated branches.
+1. Check `git status --short` and record the current branch as the one and only target. If the worktree is not clean, or the branch is `main`, detached, or checked out by another worktree, stop. Do not list or inspect other local branches.
+2. Run `git fetch origin`.
+3. Run `git log --cherry-pick --right-only --no-merges --format=%H origin/main...<branch>`. Continue only when it produces no output: the active branch then contains no patch absent from `origin/main`, even after a squash merge.
+4. If it produces output, stop and explain that one or more active-branch patches are not present in `origin/main`.
+5. Run `git switch main`, then `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
+6. Delete only the recorded target with `git branch -D <branch>`. If deletion fails, leave it intact and report the reason. Otherwise, finish on clean, up-to-date `main` and report only that target was removed.
 
 Important boundaries:
 
-- A missing `origin/<branch>` is not used as evidence of merge status; GitHub owns remote-branch deletion.
-- `git branch -D` is allowed only for the active branch after GitHub verifies its PR is merged. It is necessary because squash merges do not retain the original branch tip in `main`'s ancestry.
+- A missing `origin/<branch>` is not used as evidence of merge status; remote-branch deletion is outside this workflow.
+- `git branch -D` is allowed only for the active branch after patch-equivalence verification. It is necessary because squash merges do not retain the original branch tip in `main`'s ancestry.
 - Do not use `git reset`, `git clean`, `git stash`, or destructive recovery commands for this workflow.
 - A target checked out by another worktree must be retained; report it rather than trying to remove it.
 
