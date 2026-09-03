@@ -99,12 +99,12 @@ When the batch is accepted, verified, and committed:
 
 - push the branch
 - state clearly if more work is still planned before PR
-- if PR-ready, provide a separate clickable GitHub PR link and notes in one fenced code block
+- if PR-ready, provide a separate clickable GitHub compare link and notes in one fenced code block for the user to create the PR
 - after the notes, include this brief next-step hint: “After this PR is merged, while still on `<branch-name>`, say `clean workspace` to verify its patches, update `main`, and remove the local branch.”
 
 `git push` is downstream of a successful local commit, not a concurrent action.
 
-Keep the GitHub PR link outside the fenced block so it stays clickable and opens the compare page directly.
+Keep the GitHub compare link outside the fenced block so it stays clickable and opens the compare page directly. The user creates every PR; do not open, create, submit, or automate a PR through a browser or other tool.
 
 Suggested PR-notes shape:
 
