@@ -1,6 +1,6 @@
 ---
 name: git-pr-workflow
-description: "Use when a task should follow a consistent working-branch, review, verify, commit, push, PR-handoff, or post-merge workspace-cleanup flow across repositories. Handles requests such as clean workspace or clean merged branches conservatively: update main and remove only local branches already merged into it."
+description: "Use when a task should follow a consistent working-branch, review, verify, commit, push, PR-handoff, or post-merge workspace-cleanup flow across repositories. For cleanup, verifies that the active working branch's GitHub PR is merged, updates main, and removes only that local branch, including after a squash merge."
 ---
 
 # Git PR Workflow
@@ -19,7 +19,7 @@ The goal is to keep delivery flow consistent across repositories:
 - commit with consistent prefixes
 - push the ready branch
 - finish with a clickable GitHub PR link plus copy-pasteable PR notes
-- after merges, return the repository to an up-to-date `main` and remove safely merged local branches
+- after a PR merge, return the repository to an up-to-date `main` and remove that PR's local working branch
 
 Read [references/workflow-checklist.md](./references/workflow-checklist.md) when deciding branch naming, docs-only verification exceptions, the expected PR-notes shape, or post-merge cleanup details.
 
@@ -37,7 +37,7 @@ Read [references/workflow-checklist.md](./references/workflow-checklist.md) when
 - Never run `git add`, `git commit`, and `git push` in parallel or in one combined step; each depends on the previous step succeeding and should be checked in order.
 - After acceptance, verification, and commit, push the branch unless the user explicitly wants to stop before push.
 - End with a separate clickable GitHub PR link and copy-pasteable PR notes in a single fenced code block unless the branch is intentionally not PR-ready.
-- Treat requests such as `clean workspace`, `clean up merged branches`, and `post-merge cleanup` as a request for the cleanup workflow below. They authorize deletion only of local branches confirmed as merged into the updated `origin/main`; do not force-delete other branches.
+- Treat requests such as `clean workspace`, `clean up merged branches`, and `post-merge cleanup` as a request for the targeted cleanup workflow below. Scope it to the currently active working branch; never scan or delete unrelated local branches.
 
 ## Token Discipline
 
@@ -151,7 +151,7 @@ When the branch is accepted, verified, and committed:
 - push the branch
 - if more implementation is still planned on the same branch, say so clearly
 - if the branch is PR-ready, provide a separate clickable GitHub PR link and copy-pasteable PR notes
-- after PR notes, briefly say: “After the PR is merged, say `clean workspace` to update `main` and remove safely merged local branches.”
+- after PR notes, briefly say: “After this PR is merged, while still on `<branch-name>`, say `clean workspace` to verify it, update `main`, and remove the local branch.”
 
 Push is always downstream of a successful commit. Do not start push work until commit output confirms the new commit exists locally.
 
@@ -169,15 +169,16 @@ Place the clickable GitHub PR link outside the fenced code block so the user can
 
 ### 8. Clean the workspace after merged PRs
 
-When the user asks to clean the workspace after working branches have been merged:
+When the user asks to clean the workspace after a PR has been merged:
 
 1. Inspect the working tree and stop before switching branches or pulling if it has tracked or untracked changes. Tell the user what must be saved, committed, or stashed first.
-2. Refresh `origin`, switch to `main`, and update it with a fast-forward-only pull from `origin/main`.
-3. Identify local branches other than `main` whose tips are ancestors of the updated `origin/main`. Delete those branches with a safe delete (`git branch -d`).
-4. Keep and report local branches that are not merged, are checked out in another worktree, or cannot be safely deleted. Automatic remote-branch deletion is handled by GitHub, not this workflow.
-5. Finish on the updated `main` and report which branches were removed and which were retained with a short reason.
+2. Record the active branch as the only target. Stop if it is `main`, detached, or checked out by another worktree. Do not enumerate or inspect other local branches.
+3. Verify the target's GitHub PR is merged before making Git write changes. In a GitHub repository with authenticated GitHub CLI, query the PR by its head branch, for example `gh pr list --head <branch> --state merged --json number,mergedAt --limit 1`. Continue only when a merged PR is returned; otherwise, stop and report that it was not verified. If GitHub CLI is unavailable or unauthenticated, stop and ask the user to provide a verified PR link or authorize deletion without the check.
+4. Refresh `origin`, switch to `main`, and update it with a fast-forward-only pull from `origin/main`.
+5. Delete only the recorded target with `git branch -D <branch>`. This is required after squash merges because the branch tip is not an ancestor of `main`.
+6. Finish on the updated `main` and report only whether that active branch was removed. Automatic remote-branch deletion is handled by GitHub, not this workflow.
 
-Do not use `git branch -D`, reset, rebase, stash, or discard work as part of ordinary cleanup. Squash-merged branches are intentionally retained unless the user explicitly identifies them for deletion, because ancestry alone cannot prove they were merged.
+This narrow use of `git branch -D` is for the active branch with a verified merged PR only. Do not use reset, rebase, stash, or discard work as part of cleanup, and never infer permission to remove any other branch.
 
 ## Anti-Patterns
 
@@ -189,8 +190,9 @@ Do not use `git branch -D`, reset, rebase, stash, or discard work as part of ord
 - parallelizing `git add`, `git commit`, and `git push`
 - skipping the PR link or PR notes without saying why
 - mixing docs-only exceptions into runtime-code changes without calling out the difference
-- deleting a local branch solely because its remote-tracking branch disappeared
-- force-deleting branches, stashing, or discarding changes during routine workspace cleanup
+- scanning, evaluating, or reporting unrelated local branches during targeted cleanup
+- force-deleting any branch other than the active branch with a verified merged PR
+- stashing or discarding changes during routine workspace cleanup
 
 ## Expected Behavior When This Skill Is Used
 
@@ -203,4 +205,4 @@ When applying this skill to a task:
 5. After acceptance, run the real verification gate.
 6. Stage and commit in strict sequence with consistent prefixes.
 7. Push only after the commit succeeds, then provide a clickable PR link plus fenced PR notes when ready.
-8. For post-merge cleanup, leave the repo on current `main` and delete only local branches demonstrably merged into `origin/main`.
+8. For post-merge cleanup, verify the active branch's merged GitHub PR, leave the repo on current `main`, and remove only that active branch, including after a squash merge.

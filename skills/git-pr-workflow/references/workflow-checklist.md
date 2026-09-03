@@ -100,7 +100,7 @@ When the batch is accepted, verified, and committed:
 - push the branch
 - state clearly if more work is still planned before PR
 - if PR-ready, provide a separate clickable GitHub PR link and notes in one fenced code block
-- after the notes, add this brief next-step hint: “After the PR is merged, say `clean workspace` to update `main` and remove safely merged local branches.”
+- after the notes, include this brief next-step hint: “After this PR is merged, while still on `<branch-name>`, say `clean workspace` to verify it, update `main`, and remove the local branch.”
 
 `git push` is downstream of a successful local commit, not a concurrent action.
 
@@ -127,20 +127,21 @@ When a related commit includes an extended description, the PR-notes `Summary` b
 
 Use this when the user says `clean workspace`, `clean up merged branches`, `cleanup after merge`, or equivalent wording.
 
-The desired end state is a clean repository on the latest `main`, with local branches removed only when Git can prove they are already contained in `origin/main`.
+The desired end state is the latest `main`, with only the currently active working branch removed. This workflow verifies the branch's GitHub PR is merged, so it supports squash merges without relying on Git ancestry.
 
 1. Check `git status --short`. If it is not empty, stop: do not switch, pull, stash, reset, or delete branches. Report that the worktree must be resolved first.
-2. Refresh remote state with `git fetch origin`. Remote working branches are deleted automatically by GitHub and are outside this workflow.
-3. Switch to `main` and update it using `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
-4. For each local branch other than `main`, test whether it is an ancestor of `origin/main`. Delete only confirmed ancestors with `git branch -d <branch>`.
-5. Report retained branches and why they were not eligible.
+2. Record the current branch as the one and only target. Stop if it is `main`, detached, or checked out by another worktree. Do not list or inspect other local branches.
+3. Verify the target PR has been merged with GitHub CLI before any write operation. Use `gh pr list --head <branch> --state merged --json number,mergedAt --limit 1`, and continue only if it returns a merged PR. If `gh` is missing or unauthenticated, stop and ask for a verified PR link or explicit authorization to delete without verification.
+4. Refresh remote state with `git fetch origin`. Remote working branches are deleted automatically by GitHub and are outside this workflow.
+5. Switch to `main` and update it using `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
+6. Delete only the recorded target with `git branch -D <branch>`. If deletion fails, leave it intact and report the reason. Otherwise, report that target was removed; do not mention unrelated branches.
 
 Important boundaries:
 
-- A missing `origin/<branch>` does not establish that the local branch was merged; it may have been deleted without merge.
-- Squash merges normally do not preserve ancestry, so retain those branches unless the user explicitly asks to delete named branches.
-- Do not use `git branch -D`, `git reset`, `git clean`, `git stash`, or destructive recovery commands for this workflow.
-- A branch checked out by another worktree must be retained; report it rather than trying to remove it.
+- A missing `origin/<branch>` is not used as evidence of merge status; GitHub owns remote-branch deletion.
+- `git branch -D` is allowed only for the active branch after GitHub verifies its PR is merged. It is necessary because squash merges do not retain the original branch tip in `main`'s ancestry.
+- Do not use `git reset`, `git clean`, `git stash`, or destructive recovery commands for this workflow.
+- A target checked out by another worktree must be retained; report it rather than trying to remove it.
 
 ## Lean AGENTS.md Pattern
 
