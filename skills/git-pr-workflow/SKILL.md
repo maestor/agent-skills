@@ -1,6 +1,6 @@
 ---
 name: git-pr-workflow
-description: Use when a task should follow a consistent working-branch, review, verify, commit, push, PR-handoff, or post-merge workspace-cleanup flow across repositories. Handles requests such as “clean workspace” or “clean merged branches” conservatively: update main and remove only local branches already merged into it.
+description: "Use when a task should follow a consistent working-branch, review, verify, commit, push, PR-handoff, or post-merge workspace-cleanup flow across repositories. Handles requests such as clean workspace or clean merged branches conservatively: update main and remove only local branches already merged into it."
 ---
 
 # Git PR Workflow
