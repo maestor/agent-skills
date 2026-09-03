@@ -100,6 +100,7 @@ When the batch is accepted, verified, and committed:
 - push the branch
 - state clearly if more work is still planned before PR
 - if PR-ready, provide a separate clickable GitHub PR link and notes in one fenced code block
+- after the notes, add this brief next-step hint: “After the PR is merged, say `clean workspace` to update `main` and remove safely merged local branches.”
 
 `git push` is downstream of a successful local commit, not a concurrent action.
 
@@ -121,6 +122,25 @@ Verification
 ```
 
 When a related commit includes an extended description, the PR-notes `Summary` bullets should mirror those commit-body bullets.
+
+## Post-Merge Workspace Cleanup
+
+Use this when the user says `clean workspace`, `clean up merged branches`, `cleanup after merge`, or equivalent wording.
+
+The desired end state is a clean repository on the latest `main`, with local branches removed only when Git can prove they are already contained in `origin/main`.
+
+1. Check `git status --short`. If it is not empty, stop: do not switch, pull, stash, reset, or delete branches. Report that the worktree must be resolved first.
+2. Refresh remote state with `git fetch origin`. Remote working branches are deleted automatically by GitHub and are outside this workflow.
+3. Switch to `main` and update it using `git pull --ff-only origin main`. If either action cannot complete safely, stop and report the reason.
+4. For each local branch other than `main`, test whether it is an ancestor of `origin/main`. Delete only confirmed ancestors with `git branch -d <branch>`.
+5. Report retained branches and why they were not eligible.
+
+Important boundaries:
+
+- A missing `origin/<branch>` does not establish that the local branch was merged; it may have been deleted without merge.
+- Squash merges normally do not preserve ancestry, so retain those branches unless the user explicitly asks to delete named branches.
+- Do not use `git branch -D`, `git reset`, `git clean`, `git stash`, or destructive recovery commands for this workflow.
+- A branch checked out by another worktree must be retained; report it rather than trying to remove it.
 
 ## Lean AGENTS.md Pattern
 
