@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clean Code for TypeScript"
+  short_description: "Apply Clean Code principles to everyday TypeScript"
+  default_prompt: "Use $clean-code-typescript to simplify this TypeScript code while preserving its public behavior."

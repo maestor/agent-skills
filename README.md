@@ -6,6 +6,7 @@ Reusable agent skills for especially JavaScript/TypeScript infrastructure, inclu
 
 | Skill                      | Use for                                                           | Key bias                                                | Project type      |
 | -------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- | ----------------- |
+| `clean-code-typescript`    | Writing, refactoring, and reviewing TypeScript and TSX            | Express domain rules in names, types, and functions     | backend, frontend |
 | `intelligence-testing`     | Behavior-first TDD for real user, API, and operator flows         | Highest-signal failing test first                       | backend, frontend |
 | `mutation-testing`         | Effective backend mutation testing with incremental reruns        | Survived, no-coverage, and timeout mutants are failures | backend           |
 | `api-contract-sync`        | Keeping backend contracts, generated types, and consumers aligned | Source of truth first, no drift                         | backend, frontend |

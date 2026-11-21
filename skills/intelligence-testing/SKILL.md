@@ -138,7 +138,7 @@ When behavior is removed, treat test cleanup as part of the change:
 Once the behavior is protected:
 
 - Remove dead parameters, impossible unions, and unused fallbacks
-- Collapse duplicated logic once a single real flow proves behavior
+- Consolidate duplicated logic when its callers share the same rule and tests protect the behavior each caller relies on
 - Improve naming, structure, and extraction without changing protected behavior
 - Keep the test suite focused on observable outcomes, not new internals created during refactor
 
