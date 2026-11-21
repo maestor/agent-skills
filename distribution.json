@@ -1,0 +1,22 @@
+{
+  "consumers": [
+    "finnish-national-parks-ui",
+    "finnish-national-parks-api",
+    "node-fantrax-stats-parser",
+    "fantrax-stats-parser-ui",
+    "klamydia-record-collection",
+    "record-collection-statistics-api",
+    "record-collection-statistics-expo-app"
+  ],
+  "install": {
+    "accessibility-first-ui": [],
+    "api-contract-sync": [],
+    "browser-ui-verification": [],
+    "clean-code-typescript": [],
+    "git-pr-workflow": [],
+    "intelligence-testing": [],
+    "local-first-verification": [],
+    "mutation-testing": [],
+    "project-documentation": []
+  }
+}
