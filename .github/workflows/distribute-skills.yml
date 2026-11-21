@@ -1,0 +1,123 @@
+name: Distribute skills
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - distribution.json
+      - 'scripts/**'
+      - .github/workflows/distribute-skills.yml
+  workflow_dispatch:
+    inputs:
+      consumer:
+        description: Consumer repository name (leave empty for all seven)
+        type: string
+      preview:
+        description: Preview changes without publishing PRs
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate distribution
+    runs-on: ubuntu-latest
+    outputs:
+      consumers: ${{ steps.config.outputs.consumers }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+      - id: config
+        env:
+          CONSUMER: ${{ inputs.consumer }}
+        run: |
+          consumers=$(node scripts/distribute.mjs consumers "$CONSUMER")
+          echo "consumers=$consumers" >> "$GITHUB_OUTPUT"
+      - run: node --test scripts/distribute.test.mjs
+
+  distribute:
+    name: Sync ${{ matrix.consumer }}
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        consumer: ${{ fromJSON(needs.validate.outputs.consumers) }}
+    concurrency:
+      group: skill-distribution-${{ matrix.consumer }}-${{ inputs.preview && 'preview' || 'publish' }}
+      cancel-in-progress: false
+    steps:
+      # Reconcile the latest main even if an older run is retried.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+      - name: Package the source checkout for Codex
+        run: bash source/scripts/package-skills.sh "$RUNNER_TEMP/skill-bundle"
+      - name: Authenticate for this consumer
+        id: app
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3
+        with:
+          client-id: ${{ vars.SKILLS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_APP_PRIVATE_KEY }}
+          owner: maestor
+          repositories: ${{ matrix.consumer }}
+          permission-contents: ${{ inputs.preview && 'read' || 'write' }}
+          permission-pull-requests: ${{ inputs.preview && 'read' || 'write' }}
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: maestor/${{ matrix.consumer }}
+          token: ${{ steps.app.outputs.token }}
+          path: consumer
+          persist-credentials: false
+      - name: Apply selected skills
+        id: sync
+        env:
+          CONSUMER: ${{ matrix.consumer }}
+        run: |
+          changes=$(node source/scripts/distribute.mjs sync "$CONSUMER" consumer "$RUNNER_TEMP/skill-bundle")
+          echo "skills=$changes" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git -C source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "### $CONSUMER" >> "$GITHUB_STEP_SUMMARY"
+          echo "${changes:-Already up to date.}" >> "$GITHUB_STEP_SUMMARY"
+          git -C consumer status --short >> "$GITHUB_STEP_SUMMARY"
+      - name: Open or refresh the consumer PR
+        if: ${{ !inputs.preview }}
+        id: pr
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8
+        with:
+          token: ${{ steps.app.outputs.token }}
+          path: consumer
+          branch: automation/sync-maestor-skills
+          add-paths: |
+            .agents/skills/
+            skills-lock.json
+          delete-branch: true
+          commit-message: 'Chore: Sync shared agent skills'
+          title: 'Chore: Sync shared agent skills'
+          body: |
+            @maestor, please squash merge when the repository checks are ready.
+
+            This PR syncs ${{ steps.sync.outputs.skills }}.
+
+            [Source revision](https://github.com/maestor/agent-skills/commit/${{ steps.sync.outputs.revision }})
+      - name: Mention maestor when an open PR receives new commits
+        if: steps.pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR_URL: ${{ steps.pr.outputs.pull-request-url }}
+        run: gh pr comment "$PR_URL" --body '@maestor, the shared skills PR has new commits. Please squash merge when the checks are ready.'
